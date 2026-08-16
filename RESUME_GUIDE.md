@@ -83,8 +83,8 @@ List certs under a **Certifications** section. While in progress, write
 "Expected [Month Year]". Once passed, write the cert code and date.
 
 ```
-CompTIA A+ (in progress)            — CompTIA — Expected 2026
-CompTIA Network+ (planned)          — CompTIA
+CompTIA A+ (planned)            — CompTIA — Targeting 2026
+CompTIA Network+ (planned)        — CompTIA
 CompTIA Security+ (planned)        — CompTIA
 ```
 
