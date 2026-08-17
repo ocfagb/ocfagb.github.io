@@ -1,113 +1,138 @@
-# Résumé Guide — IT & Cybersecurity
+# Résumé Guide — Cybersecurity & IT Operations
 
-This file gives you **ready-to-paste résumé bullet points** tied directly to
-the portfolio site in this repo. The golden rule: every bullet on your résumé
-should point to something a recruiter can actually click or ask you about.
+This file gives you **ready-to-paste résumé bullet points** drawn from your
+actual experience. Keep every bullet tied to something you can speak to in an
+interview and, ideally, link to in this portfolio.
 
----
-
-## How to use this guide
-
-1. Complete a lab in the **Projects** section of the site.
-2. Flip that project's status badge to "Ready" in `index.html`.
-3. Copy the matching bullet below into your résumé under a **Projects** or
-   **Technical Experience** section.
-4. Add the live link: `https://<your-username>.github.io/`
-
-> Résumé best practice: start bullets with a strong verb, include the
-> technology, and state the outcome or value. Quantify wherever you can.
+> **Résumé best practice:** lead with a verb, name the technology, state the
+> outcome or value, and quantify wherever possible. Your portfolio link goes at
+> the top of your résumé: `ocfagb.github.io`.
 
 ---
 
-## Projects section — résumé bullets
+## Professional experience — résumé bullets
 
-### Home Network Hardening Lab
-- Hardened a home network segment by changing default router credentials,
-  disabling unused services, and isolating IoT/guest traffic on a separate
-  VLAN, reducing exposure of personal devices to the public network.
-- Documented the engagement end-to-end (scope, before/after, and residual
-  risk) in a markdown write-up published on GitHub.
+### Fulton County Government — Network & Security Specialist (Dec 2023–Present)
 
-### Windows & Linux Security Baseline
-- Applied CIS-baseline security controls to Windows 10 and Ubuntu VMs,
-  including account lockout policy, least-privilege user configuration, and
-  firewall rules, then verified configuration with a hardening checklist.
-- Demonstrated cross-platform OS hardening across both Windows and Linux
-  environments.
+- Administer CyberArk PAM (PVWA/PSM) for privileged credential checkout and
+  secure RDP sessions, enforcing least-privilege Safe permissions and credential
+  rotation with zero compliance findings during access reviews.
+- Manage the full Active Directory and Entra ID identity lifecycle for 200+
+  accounts — GPO, RBAC, NTFS permissions, and M365 (Exchange Online, SharePoint,
+  Teams, Intune) — eliminating orphaned accounts during tenure.
+- Drive endpoint and asset lifecycle for 200+ devices via SCCM/MECM imaging,
+  Intune, and Autopilot, with zero compliance deadline misses.
+- Deliver Tier 1–2 support and Cisco IOS changes under ServiceNow change
+  management, sustaining 99.9% uptime, 100% SLA compliance, and 95%
+  first-contact resolution across 200+ users.
+- Author PowerShell and Bash automation that reduced recurring task time by
+  ~30% and improved documentation accuracy.
+- Support post-incident modernization after the 2022 county cyberattack —
+  hybrid cloud migration, MFA via Entra ID Conditional Access, and NIST
+  800-53-aligned authentication hardening.
 
-### SIEM Log Analysis Lab
-- Ingested sample authentication logs into a free SIEM and authored
-  detection rules for brute-force and off-hours access, producing a
-  triaged incident summary with recommended response actions.
-- Practiced core blue-team skills: log parsing, alert triage, and written
-  incident reporting.
+### Allied Universal — Account Assistant Manager (Jun 2023–Nov 2023)
 
-### Vulnerability Assessment Report
-- Ran a vulnerability scanner against a deliberately vulnerable VM, triaged
-  findings by CVSS severity, and authored a remediation report a non-technical
-  stakeholder could act on.
-- Practiced vulnerability management lifecycle: identify → prioritize →
-  remediate → verify.
+- Monitored and triaged NVR/IP camera systems with Victor VMS, maintaining
+  continuous surveillance coverage and complete incident documentation.
+- Administered access control databases in Lenel and C•CURE for 500+ personnel
+  profiles.
+- Supervised 8–12 staff with 100% project schedule adherence.
+- Developed Python and Bash scripts that cut report generation time by ~40%.
 
-### Python IOC Checker
-- Built a Python CLI tool that checks a list of IPs and file hashes against a
-  threat-intelligence API and flags matches, demonstrating scripting and
-  REST API integration.
-- Wrote reusable, documented code with input validation and clear output.
+### TKincorporated — Information Security Analyst Intern (Aug 2021–Dec 2022)
 
-### Incident Response Case Study
-- Walked a sample breach through the NIST Incident Response lifecycle
-  (Preparation, Detection & Analysis, Containment, Eradication, Recovery)
-  and documented each phase.
-- Demonstrated structured, framework-driven incident handling.
+- Triaged 100+ monthly Splunk SIEM alerts using Exabeam behavioral analytics to
+  detect phishing, malware, and unauthorized access.
+- Ran Nessus/Tenable.io vulnerability assessments identifying 200+
+  vulnerabilities and driving a 35% reduction in exposure risk via prioritized
+  CVE remediation.
+- Produced NIST 800-53-aligned incident documentation supporting audit readiness.
 
 ---
 
-## Skills section — résumé keywords
+## Projects — résumé bullets
 
-Drop these into your résumé's **Skills** section (ATS systems keyword-match
-these, so keep them literal):
+### Penetration Testing & Exploitation Lab
+- Compromised vulnerable Windows/Linux targets in an isolated Kali lab using
+  the Metasploit Framework — a malicious PDF exploiting Adobe Reader
+  (CVE-2010-1240), Distcc RCE (CVE-2004-2687), and Netcat bind/reverse shells —
+  with documented defensive countermeasures per attack vector.
 
-- **Operating Systems:** Windows 10/11, Ubuntu Linux, command-line (CLI)
-- **Networking:** TCP/IP, DNS, ports & protocols, Wireshark
-- **Security:** security fundamentals, system hardening, access control (IAM),
-  vulnerability management basics
-- **Scripting:** Python, Bash, regular expressions
-- **Tools:** Git/GitHub, VirtualBox, Nmap, SIEM/log analysis
+### NSA Codebreaker Challenge 2021–2022
+- Performed adversarial network forensics with Wireshark, browser dev tools,
+  and Splunk; decrypted TLS/RSA traffic with Ghidra and Python and automated
+  private-key extraction via GDB scripting with 100% documented accuracy.
+
+### AI Workflow Automation Agent
+- Built a Python/LangChain automation agent integrating the OpenAI REST API
+  with JSON handling, demonstrating API integration and prompt engineering.
+
+### Drone Hacking / MITRE ATT&CK
+- Executed Wi-Fi/RF drone attack simulations by reverse-engineering the DJI SDK,
+  mapping techniques to MITRE ATT&CK and documenting detection/mitigation.
+
+### Snort IDS Signature Development
+- Conducted APT malware analysis in Ghidra and Wireshark and developed Snort
+  IDS signatures that improved detection by ~30%.
+
+### Cisco / pfSense Home Lab
+- Maintained a segmented Cisco IOS / pfSense home lab with Python and Bash
+  automated runbooks for testing security controls and detection content.
+
+---
+
+## Skills — ATS keywords
+
+Drop these literal keywords into your résumé's **Skills** section (ATS systems
+match them exactly):
+
+- **Identity & PAM:** CyberArk PAM (PVWA, PSM), Active Directory (GPO, OU, RBAC),
+  Azure AD / Entra ID, Okta, NTFS permissions, least-privilege
+- **Endpoint & Lifecycle:** SCCM/MECM, Intune, Windows Autopilot, workstation
+  imaging, IMAC, asset lifecycle
+- **Security Operations:** Splunk, Exabeam, EDR/XDR (Cortex, Taegis), Proofpoint,
+  Zscaler, Varonis, KnowBe4, Nessus, Tenable.io, Snort IDS, Metasploit, NIST
+  800-53, MITRE ATT&CK, incident response, RCA
+- **Network & Infrastructure:** Cisco IOS, VLAN/VPN, Palo Alto, Forescout NAC,
+  Barracuda WAF, SolarWinds NPM, SNMP, TCP/IP, DNS, DHCP, pfSense
+- **Scripting & Development:** Python, PowerShell, Bash, SQL (PL/SQL), Java, GDB
+  scripting, REST APIs, LangChain, OpenAI API, HTML/CSS, Wireshark, Ghidra
+- **Platforms & ITSM:** Microsoft 365, Exchange Online, SharePoint, Teams,
+  Windows 10/11, Linux (Kali, Ubuntu), ServiceNow, BMC Helix, JIRA, Zendesk,
+  Remedy, ITIL 4
 
 ---
 
 ## Certifications — how to list them
 
-List certs under a **Certifications** section. While in progress, write
-"Expected [Month Year]". Once passed, write the cert code and date.
-
 ```
-CompTIA A+ (planned)            — CompTIA — Targeting 2026
-CompTIA Network+ (planned)        — CompTIA
-CompTIA Security+ (planned)        — CompTIA
+CompTIA Security+              — CompTIA
+EC-Council CHFI               — EC-Council
+ITIL 4 Foundation              — AXELOS / ITIL
+AWS Cloud Practitioner Essentials — Amazon Web Services
+Google IT Support Professional — Google
+Google Data Analytics Professional — Google
+EC-Council Master ChatGPT for Ethical Hacking (in progress) — EC-Council
 ```
-
-Target sequence aligned to the [NIST NICE Framework](https://www.nist.gov/itl/applied-cybersecurity/nice-framework)
-and CompTIA's pathway: A+ → Network+ → Security+ → CySA+.
 
 ---
 
-## The one-line portfolio line for your résumé
+## The portfolio line for your résumé
 
-> **Portfolio & lab write-ups:** github.com/<your-username> · live site:
-> <your-username>.github.io
+> **Portfolio & project write-ups:** [ocfagb.github.io](https://ocfagb.github.io)
+> · GitHub: [github.com/ocfagb](https://github.com/ocfagb)
 
-Put this near the top of your résumé (under your contact info) so recruiters
-see it first.
+Put this under your contact info at the top of your résumé so recruiters see it
+first.
 
 ---
 
-## Keeping résumé numbers in sync
+## Keeping it honest
 
-The "Resume at a glance" stats on the site (number of labs, OS platforms,
-certs) are placeholders. Update them in `index.html` (search for
-`resume__grid`) to match reality as you complete work. Never inflate numbers.
+Only present metrics you can defend in an interview. As you add full project
+write-ups to this repo, link each project card to its folder so claims are
+backed by evidence.
 
 ---
 

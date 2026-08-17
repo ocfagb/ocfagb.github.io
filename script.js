@@ -33,12 +33,12 @@
 
   var lines = [
     { type: 'cmd', text: 'whoami' },
-    { type: 'out', text: 'oreoluwa — IT & cybersecurity learner' },
-    { type: 'cmd', text: 'cat posture.txt' },
-    { type: 'out', text: '> 6 labs in progress  ·  Windows + Linux  ·  Python/Bash' },
-    { type: 'cmd', text: 'git log --oneline -n 1' },
-    { type: 'ok', text: 'latest commit: documented home-network hardening lab' },
-    { type: 'cmd', text: './next-step --cert Security+' },
+    { type: 'out', text: 'ore.fagbamiye — cybersecurity & IT operations' },
+    { type: 'cmd', text: 'cat experience.summary' },
+    { type: 'out', text: '> 3+ yrs enterprise · 200+ users · 99.9% uptime · 100% SLA' },
+    { type: 'cmd', text: 'cat certs.txt' },
+    { type: 'ok', text: 'CompTIA Security+ · EC-Council CHFI · ITIL 4' },
+    { type: 'cmd', text: './contact --github ocfagb' },
     { type: 'caret' }
   ];
 
