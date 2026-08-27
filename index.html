@@ -25,6 +25,17 @@
     />
 
     <link rel="stylesheet" href="styles.css" />
+    <style>
+      /* project-card outbound links */
+      .card-links { display: flex; flex-wrap: wrap; gap: var(--space-4); margin-top: var(--space-3); }
+      .card-links a {
+        display: inline-flex; align-items: center; gap: var(--space-2);
+        font-family: var(--font-display); font-size: var(--text-xs); font-weight: 500;
+        color: var(--color-primary); text-decoration: none;
+      }
+      .card-links a:hover { color: var(--color-primary-hover); text-decoration: underline; text-underline-offset: 3px; }
+      .card-links svg { width: 13px; height: 13px; }
+    </style>
     <link
       rel="icon"
       href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2322d3ee' stroke-width='2'%3E%3Cpath d='M12 2l8 4v6c0 5-3.4 8-8 10-4.6-2-8-5-8-10V6l8-4z'/%3E%3Cpath d='M9 12l2 2 4-4'/%3E%3C/svg%3E"
@@ -324,6 +335,26 @@
             <div class="skill-card">
               <div class="skill-card__icon">
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path d="M12 2l8 4v6c0 5-3.4 8-8 10-4.6-2-8-5-8-10V6l8-4z" />
+                  <path d="M15 9l-4 4-2-2" />
+                </svg>
+              </div>
+              <h3>Offensive &amp; Wireless Security</h3>
+              <p>Exploitation labs, adversary emulation, and 802.11 attacks against owned test equipment.</p>
+              <div class="skill-tags">
+                <span class="tag">Metasploit</span>
+                <span class="tag">Kali Linux</span>
+                <span class="tag">Wi-Fi Pineapple</span>
+                <span class="tag">Hashcat / Aircrack-ng</span>
+                <span class="tag">802.11 / WPA2 / WPA3</span>
+                <span class="tag">Netcat</span>
+                <span class="tag">ATT&amp;CK Navigator</span>
+              </div>
+            </div>
+
+            <div class="skill-card">
+              <div class="skill-card__icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                   <circle cx="12" cy="12" r="10" />
                   <path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20" />
                 </svg>
@@ -346,15 +377,17 @@
                   <path d="M16 18l6-6-6-6M8 6l-6 6 6 6" />
                 </svg>
               </div>
-              <h3>Automation &amp; Development</h3>
-              <p>Scripting, REST APIs, and AI agent development.</p>
+              <h3>Automation, Cloud &amp; Development</h3>
+              <p>Scripting, REST APIs, containers, and AI agent development.</p>
               <div class="skill-tags">
                 <span class="tag">Python</span>
                 <span class="tag">PowerShell</span>
                 <span class="tag">Bash</span>
                 <span class="tag">SQL</span>
                 <span class="tag">REST APIs</span>
-                <span class="tag">LangChain / OpenAI</span>
+                <span class="tag">Docker</span>
+                <span class="tag">Google Cloud / Cloud Run</span>
+                <span class="tag">LLM agents / RAG</span>
               </div>
             </div>
 
@@ -387,7 +420,8 @@
             <h2 class="section__title">Projects &amp; competitions</h2>
             <p class="section__lede">
               Hands-on security engineering and research — from offensive labs to
-              AI automation. Full write-ups live in this repo's project folders.
+              cloud and AI automation. Write-ups and source on
+              <a href="https://github.com/ocfagb" target="_blank" rel="noopener" style="color: var(--color-primary)">GitHub</a>.
             </p>
           </div>
 
@@ -412,6 +446,12 @@
                   <span class="tag">Metasploit</span>
                   <span class="tag">Kali Linux</span>
                   <span class="tag">Netcat</span>
+                </div>
+                <div class="card-links">
+                  <a href="https://github.com/ocfagb/hacktivity-vulns-exploits-lab" target="_blank" rel="noopener">
+                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.7.5.5 5.7.5 12c0 5 3.3 9.3 7.9 10.8.6.1.8-.3.8-.6v-2c-3.2.7-3.9-1.4-3.9-1.4-.5-1.3-1.3-1.7-1.3-1.7-1-.7.1-.7.1-.7 1.1.1 1.7 1.2 1.7 1.2 1 .1.8 1.7 2.6 1.2.1-.7.4-1.2.7-1.5-2.6-.3-5.3-1.3-5.3-5.8 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.3 1.2a11 11 0 0 1 5.9 0C18 6.5 19 6.8 19 6.8c.6 1.6.2 2.8.1 3.1.8.8 1.2 1.8 1.2 3.1 0 4.5-2.7 5.5-5.3 5.8.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6 4.6-1.5 7.9-5.8 7.9-10.8C23.5 5.7 18.3.5 12 .5z" /></svg>
+                    Writeup &amp; countermeasures
+                  </a>
                 </div>
               </div>
             </article>
@@ -449,16 +489,54 @@
               </div>
               <div class="project-card__body">
                 <span class="status-badge is-ready">Completed</span>
-                <h3>AI Workflow Automation Agent</h3>
+                <h3>Cloud Run + ADK AI Agents</h3>
                 <p>
-                  Built a Python/LangChain automation agent integrating the OpenAI
-                  REST API with JSON handling — demonstrating API integration,
-                  prompt engineering, and end-to-end workflow automation.
+                  Three Google Cloud codelabs rebuilt as deployable projects:
+                  tool-calling agents on Cloud Run with sandboxed code execution,
+                  a Streamlit RAG app backed by Firestore vector search, and a
+                  self-hosted Gemma model on GPU wired to BigQuery over MCP —
+                  each reproducible from scripts with least-privilege IAM.
+                </p>
+                <div class="project-card__tags">
+                  <span class="tag">Google Cloud</span>
+                  <span class="tag">Cloud Run</span>
+                  <span class="tag">RAG / vector search</span>
+                  <span class="tag">IAM</span>
+                </div>
+                <div class="card-links">
+                  <a href="https://github.com/ocfagb/cloud-run-adk-agents" target="_blank" rel="noopener">
+                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.7.5.5 5.7.5 12c0 5 3.3 9.3 7.9 10.8.6.1.8-.3.8-.6v-2c-3.2.7-3.9-1.4-3.9-1.4-.5-1.3-1.3-1.7-1.3-1.7-1-.7.1-.7.1-.7 1.1.1 1.7 1.2 1.7 1.2 1 .1.8 1.7 2.6 1.2.1-.7.4-1.2.7-1.5-2.6-.3-5.3-1.3-5.3-5.8 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.3 1.2a11 11 0 0 1 5.9 0C18 6.5 19 6.8 19 6.8c.6 1.6.2 2.8.1 3.1.8.8 1.2 1.8 1.2 3.1 0 4.5-2.7 5.5-5.3 5.8.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6 4.6-1.5 7.9-5.8 7.9-10.8C23.5 5.7 18.3.5 12 .5z" /></svg>
+                    Code
+                  </a>
+                </div>
+              </div>
+            </article>
+
+            <article class="project-card">
+              <div class="project-card__media">
+                <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+                  <path d="M16 18l6-6-6-6M8 6l-6 6 6 6" />
+                </svg>
+              </div>
+              <div class="project-card__body">
+                <span class="status-badge is-ready">Completed</span>
+                <h3>AI Job-Search Framework</h3>
+                <p>
+                  A local automation framework built on Claude Code that evaluates
+                  job postings, tailors CVs, drafts cover letters, and preps
+                  interviews — API integration, prompt design, and end-to-end
+                  workflow automation.
                 </p>
                 <div class="project-card__tags">
                   <span class="tag">Python</span>
-                  <span class="tag">LangChain</span>
-                  <span class="tag">OpenAI API</span>
+                  <span class="tag">LLM agents</span>
+                  <span class="tag">Automation</span>
+                </div>
+                <div class="card-links">
+                  <a href="https://github.com/ocfagb/ai-job-search" target="_blank" rel="noopener">
+                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.7.5.5 5.7.5 12c0 5 3.3 9.3 7.9 10.8.6.1.8-.3.8-.6v-2c-3.2.7-3.9-1.4-3.9-1.4-.5-1.3-1.3-1.7-1.3-1.7-1-.7.1-.7.1-.7 1.1.1 1.7 1.2 1.7 1.2 1 .1.8 1.7 2.6 1.2.1-.7.4-1.2.7-1.5-2.6-.3-5.3-1.3-5.3-5.8 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.3 1.2a11 11 0 0 1 5.9 0C18 6.5 19 6.8 19 6.8c.6 1.6.2 2.8.1 3.1.8.8 1.2 1.8 1.2 3.1 0 4.5-2.7 5.5-5.3 5.8.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6 4.6-1.5 7.9-5.8 7.9-10.8C23.5 5.7 18.3.5 12 .5z" /></svg>
+                    Code
+                  </a>
                 </div>
               </div>
             </article>
@@ -471,17 +549,30 @@
                 </svg>
               </div>
               <div class="project-card__body">
-                <span class="status-badge is-ready">Completed</span>
-                <h3>Drone Hacking / MITRE ATT&amp;CK</h3>
+                <span class="status-badge is-ready">Research</span>
+                <h3>Hijacking a Wi-Fi Drone / MITRE ATT&amp;CK</h3>
                 <p>
-                  Executed Wi-Fi/RF drone attack simulations by reverse-engineering
-                  the DJI SDK, mapping techniques to MITRE ATT&amp;CK and documenting
-                  detection and mitigation strategies.
+                  Hijacked a consumer Wi-Fi drone (Ryze Tello) end to end — a
+                  one-click deauthentication attack to seize control, then an
+                  offline WPA2 handshake crack with Hashcat — using Kali and a
+                  Wi-Fi Pineapple. Every step mapped tactic-by-tactic to MITRE
+                  ATT&amp;CK, with manufacturer and operator mitigations.
                 </p>
                 <div class="project-card__tags">
-                  <span class="tag">DJI SDK RE</span>
-                  <span class="tag">Wi-Fi/RF</span>
+                  <span class="tag">802.11 / deauth</span>
+                  <span class="tag">WPA2 / Hashcat</span>
+                  <span class="tag">Wi-Fi Pineapple</span>
                   <span class="tag">MITRE ATT&amp;CK</span>
+                </div>
+                <div class="card-links">
+                  <a href="writeups/hijacking-a-wifi-drone.html">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" /></svg>
+                    Read the writeup
+                  </a>
+                  <a href="https://github.com/ocfagb/wifi-drone-hijacking-mitre-attack" target="_blank" rel="noopener">
+                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.7.5.5 5.7.5 12c0 5 3.3 9.3 7.9 10.8.6.1.8-.3.8-.6v-2c-3.2.7-3.9-1.4-3.9-1.4-.5-1.3-1.3-1.7-1.3-1.7-1-.7.1-.7.1-.7 1.1.1 1.7 1.2 1.7 1.2 1 .1.8 1.7 2.6 1.2.1-.7.4-1.2.7-1.5-2.6-.3-5.3-1.3-5.3-5.8 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.3 1.2a11 11 0 0 1 5.9 0C18 6.5 19 6.8 19 6.8c.6 1.6.2 2.8.1 3.1.8.8 1.2 1.8 1.2 3.1 0 4.5-2.7 5.5-5.3 5.8.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6 4.6-1.5 7.9-5.8 7.9-10.8C23.5 5.7 18.3.5 12 .5z" /></svg>
+                    Code
+                  </a>
                 </div>
               </div>
             </article>

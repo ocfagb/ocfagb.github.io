@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hijacking a Wi-Fi Drone — Oreoluwa Fagbamiye</title>
+    <meta
+      name="description"
+      content="A wireless-security study of how easily a consumer Wi-Fi drone (Ryze Tello) can be hijacked, with every step mapped to the MITRE ATT&CK framework."
+    />
+    <meta name="author" content="Oreoluwa Fagbamiye" />
+    <meta property="og:title" content="Hijacking a Wi-Fi Drone with MITRE ATT&CK" />
+    <meta property="og:description" content="Deauthentication, WPA2 handshake cracking, and adversary emulation against a consumer drone." />
+    <meta property="og:type" content="article" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../styles.css" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2322d3ee' stroke-width='2'%3E%3Cpath d='M12 2l8 4v6c0 5-3.4 8-8 10-4.6-2-8-5-8-10V6l8-4z'/%3E%3Cpath d='M9 12l2 2 4-4'/%3E%3C/svg%3E"
+    />
+
+    <style>
+      /* article-scoped, built on the site's design tokens */
+      .article {
+        max-width: 760px;
+        margin-inline: auto;
+        padding-block: clamp(var(--space-10), 6vw, var(--space-20));
+      }
+      .article__eyebrow {
+        font-family: var(--font-display);
+        font-size: var(--text-xs);
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--color-primary);
+      }
+      .article h1 {
+        font-family: var(--font-display);
+        font-weight: 700;
+        font-size: var(--text-xl);
+        line-height: 1.15;
+        letter-spacing: -0.01em;
+        margin: var(--space-4) 0 var(--space-4);
+        text-wrap: balance;
+      }
+      .article__deck {
+        font-size: var(--text-lg);
+        color: var(--color-text-muted);
+        line-height: 1.5;
+        margin-bottom: var(--space-5);
+        text-wrap: pretty;
+      }
+      .article__meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-2) var(--space-4);
+        font-size: var(--text-sm);
+        color: var(--color-text-muted);
+        font-family: var(--font-display);
+      }
+      .article__meta strong { color: var(--color-text); font-weight: 500; }
+      .article__chips { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-5); }
+
+      .article section { margin-top: var(--space-12); }
+      .article h2 {
+        font-family: var(--font-display);
+        font-weight: 700;
+        font-size: var(--text-lg);
+        letter-spacing: -0.01em;
+        margin-bottom: var(--space-4);
+        display: flex;
+        gap: var(--space-3);
+        align-items: baseline;
+      }
+      .article h2 .n { color: var(--color-primary); font-size: var(--text-sm); flex: none; }
+      .article h3 {
+        font-size: var(--text-base);
+        font-weight: 600;
+        margin: var(--space-6) 0 var(--space-2);
+      }
+      .article p { margin-bottom: var(--space-4); line-height: 1.7; }
+      .article a { color: var(--color-primary); text-underline-offset: 3px; }
+      .article strong { color: var(--color-text); font-weight: 600; }
+      .article em { color: var(--color-text); }
+
+      .abstract {
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-left: 3px solid var(--color-primary);
+        border-radius: var(--radius-md);
+        padding: var(--space-5) var(--space-6);
+        margin-top: var(--space-8);
+      }
+      .abstract .k {
+        font-family: var(--font-display);
+        font-size: var(--text-xs);
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--color-text-faint);
+        margin-bottom: var(--space-3);
+      }
+      .abstract p { margin: 0; }
+
+      .toc { margin-top: var(--space-6); padding-top: var(--space-5); border-top: 1px solid var(--color-divider); }
+      .toc ol {
+        list-style: none; margin: 0; padding: 0;
+        display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: var(--space-2) var(--space-6);
+        counter-reset: t;
+      }
+      .toc li { counter-increment: t; }
+      .toc a { color: var(--color-text-muted); text-decoration: none; font-size: var(--text-sm); display: block; padding: var(--space-1) 0; }
+      .toc a::before { content: counter(t, decimal-leading-zero) "  "; font-family: var(--font-display); color: var(--color-text-faint); font-size: var(--text-xs); }
+      .toc a:hover { color: var(--color-primary); }
+
+      .quote {
+        border-left: 3px solid var(--color-primary);
+        padding-left: var(--space-5);
+        margin: var(--space-6) 0;
+        font-family: var(--font-display);
+        font-size: var(--text-lg);
+        line-height: 1.4;
+        color: var(--color-text);
+      }
+
+      .spec { border: 1px solid var(--color-border); border-radius: var(--radius-md); overflow: hidden; margin: var(--space-5) 0; }
+      .spec div { display: grid; grid-template-columns: minmax(6rem, 8rem) 1fr; gap: var(--space-4); padding: var(--space-3) var(--space-5); font-size: var(--text-sm); }
+      .spec div + div { border-top: 1px solid var(--color-divider); }
+      .spec dt { font-family: var(--font-display); font-size: var(--text-xs); letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-text-faint); }
+      .spec dd { margin: 0; }
+
+      .table-scroll { overflow-x: auto; border: 1px solid var(--color-border); border-radius: var(--radius-md); margin: var(--space-5) 0; }
+      .article table { border-collapse: collapse; width: 100%; min-width: 620px; font-size: var(--text-sm); }
+      .article thead th {
+        text-align: left; font-family: var(--font-display); font-weight: 500;
+        font-size: var(--text-xs); letter-spacing: 0.08em; text-transform: uppercase;
+        color: var(--color-text-faint); padding: var(--space-3) var(--space-4);
+        border-bottom: 1px solid var(--color-border); background: var(--color-surface-2);
+      }
+      .article tbody td { padding: var(--space-3) var(--space-4); border-bottom: 1px solid var(--color-divider); vertical-align: top; }
+      .article tbody tr:last-child td { border-bottom: 0; }
+      .article tbody tr:nth-child(even) { background: var(--color-surface-2); }
+      td.tac { font-family: var(--font-display); font-size: var(--text-xs); color: var(--color-primary); white-space: nowrap; }
+      td.tec { color: var(--color-text-muted); }
+
+      .article pre {
+        background: var(--color-surface); border: 1px solid var(--color-border);
+        border-radius: var(--radius-md); padding: var(--space-4) var(--space-5);
+        overflow-x: auto; font-family: var(--font-display); font-size: var(--text-sm);
+        margin: var(--space-4) 0; color: var(--color-text);
+      }
+      .article :not(pre) > code {
+        font-family: var(--font-display); font-size: 0.9em;
+        background: var(--color-surface-offset); border: 1px solid var(--color-divider);
+        border-radius: var(--radius-sm); padding: 0.05em 0.35em;
+      }
+
+      .findings { list-style: none; margin: var(--space-5) 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-4); }
+      .findings li { position: relative; padding-left: var(--space-6); line-height: 1.6; }
+      .findings li::before { content: ""; position: absolute; left: 0; top: 0.55em; width: 0.5rem; height: 0.5rem; background: var(--color-primary); transform: rotate(45deg); }
+
+      .recs { display: grid; gap: var(--space-5); margin: var(--space-5) 0; }
+      @media (min-width: 680px) { .recs { grid-template-columns: 1fr 1fr; } }
+      .rec { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-5); }
+      .rec h3 { margin: 0 0 var(--space-3); }
+      .rec ul { margin: 0; padding-left: var(--space-5); display: flex; flex-direction: column; gap: var(--space-2); }
+      .rec li { font-size: var(--text-sm); line-height: 1.5; }
+      .rec li::marker { color: var(--color-primary); }
+
+      .callout {
+        background: var(--color-warning-highlight);
+        border: 1px solid color-mix(in oklab, var(--color-warning) 40%, transparent);
+        border-radius: var(--radius-md); padding: var(--space-4) var(--space-5); margin: var(--space-6) 0; font-size: var(--text-sm);
+      }
+      .callout .k { font-family: var(--font-display); font-size: var(--text-xs); letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-warning); display: block; margin-bottom: var(--space-2); }
+      .callout p { margin: 0; }
+
+      .article__foot {
+        margin-top: var(--space-16); padding-top: var(--space-6);
+        border-top: 1px solid var(--color-divider); font-size: var(--text-sm); color: var(--color-text-muted); line-height: 1.6;
+      }
+      .article__foot .ethics {
+        background: var(--color-surface-2); border: 1px solid var(--color-divider);
+        border-radius: var(--radius-md); padding: var(--space-4) var(--space-5); margin-bottom: var(--space-5);
+      }
+      .article__foot .ethics strong { color: var(--color-text); }
+      .back-link { display: inline-flex; align-items: center; gap: var(--space-2); font-family: var(--font-display); font-size: var(--text-sm); color: var(--color-text-muted); text-decoration: none; margin-bottom: var(--space-6); }
+      .back-link:hover { color: var(--color-primary); }
+    </style>
+  </head>
+  <body>
+    <header class="header">
+      <div class="container header__inner">
+        <a href="../index.html#top" class="logo" aria-label="Oreoluwa Fagbamiye — home">
+          <svg class="logo__mark" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M12 2l8 4v6c0 5-3.4 8-8 10-4.6-2-8-5-8-10V6l8-4z" />
+            <path d="M9 12l2 2 4-4" />
+          </svg>
+          <span>ore.fagbamiye<span style="color: var(--color-text-faint)">.sec</span></span>
+        </a>
+        <nav class="nav" aria-label="Primary">
+          <a href="../index.html#experience">Experience</a>
+          <a href="../index.html#skills">Skills</a>
+          <a href="../index.html#projects">Projects</a>
+          <a href="../index.html#contact">Contact</a>
+        </nav>
+        <div class="header__actions">
+          <button class="theme-toggle" data-theme-toggle aria-label="Switch to light mode">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <circle cx="12" cy="12" r="5" />
+              <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="container">
+      <article class="article">
+        <a href="../index.html#projects" class="back-link">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7" /></svg>
+          All projects
+        </a>
+
+        <p class="article__eyebrow">Wireless security · research</p>
+        <h1>Hijacking a Wi-Fi&#8209;based drone with MITRE ATT&amp;CK</h1>
+        <p class="article__deck">
+          Consumer drones increasingly replace the radio controller with an
+          ordinary Wi-Fi link to a phone. That one design choice puts the
+          flight-control channel on a medium with decades of well-understood
+          attacks. This is a hands-on test of how far that goes — against a real
+          drone, with a laptop.
+        </p>
+        <div class="article__meta">
+          <span>By <strong>Oreoluwa Fagbamiye</strong></span>
+          <span>Research 2023</span>
+          <span>~12 min read</span>
+        </div>
+        <div class="article__chips">
+          <span class="tag">UAV security</span>
+          <span class="tag">802.11</span>
+          <span class="tag">deauthentication</span>
+          <span class="tag">WPA2 / WPA3</span>
+          <span class="tag">Wi-Fi Pineapple</span>
+          <span class="tag">Hashcat</span>
+          <span class="tag">MITRE ATT&amp;CK</span>
+          <span class="tag">Ryze Tello</span>
+        </div>
+
+        <div class="abstract">
+          <p class="k">Abstract</p>
+          <p>
+            Many consumer drones talk to a smartphone app over their own Wi-Fi
+            access point instead of a dedicated radio. It removes a controller —
+            and exposes the aircraft to the full catalogue of wireless attacks.
+            This study tests that exposure end to end against the Ryze Tello, a
+            small programmable drone sold for education, using only a laptop
+            running Kali Linux, a USB Wi-Fi adapter, and a Wi-Fi Pineapple. Every
+            step is mapped to the MITRE ATT&amp;CK framework, so the work doubles
+            as an adversary-emulation reference. The result: a single
+            deauthentication command takes a Tello away from its operator, and any
+            network password — where one is set at all — falls to an offline
+            dictionary attack. The study closes with concrete recommendations for
+            manufacturers and operators.
+          </p>
+        </div>
+
+        <nav class="toc" aria-label="Contents">
+          <ol>
+            <li><a href="#exposed">Why Wi-Fi drones are exposed</a></li>
+            <li><a href="#tello">The test platform: Ryze Tello</a></li>
+            <li><a href="#method">Method and setup</a></li>
+            <li><a href="#attack">The attack, mapped to ATT&amp;CK</a></li>
+            <li><a href="#crack">Cracking the Wi-Fi password</a></li>
+            <li><a href="#findings">Findings</a></li>
+            <li><a href="#recommendations">Recommendations</a></li>
+            <li><a href="#conclusion">Conclusion</a></li>
+          </ol>
+        </nav>
+
+        <section id="exposed">
+          <h2><span class="n">01</span>Why Wi-Fi drones are exposed</h2>
+          <p>
+            Civilian drone use has grown from a hobby into a mass market, with
+            annual sales in the millions and applications spanning delivery,
+            inspection, journalism, activism, and surveillance. With that growth
+            comes a corresponding rise in privacy and security concerns — most
+            studies of which stop at <em>what</em> could go wrong and rarely test
+            <em>how easily</em>.
+          </p>
+          <p>
+            More expensive drones use a dedicated radio controller. Cheaper ones
+            skip it: the drone raises its own Wi-Fi access point and a smartphone
+            app connects to it. That is cheaper to build and convenient to use —
+            but it moves the flight-control channel onto 802.11, a medium whose
+            attacks have been studied and tooled for twenty years. The research
+            question here is deliberately blunt:
+          </p>
+          <p class="quote">Could someone with a laptop and a Wi-Fi antenna take a commercial drone out of the sky?</p>
+        </section>
+
+        <section id="tello">
+          <h2><span class="n">02</span>The test platform: Ryze Tello</h2>
+          <p>
+            The Tello is a small, inexpensive programmable drone marketed for
+            education. Powered on, it immediately broadcasts an open access point
+            named <code>TELLO-xxxx</code>. <strong>No password is required to
+            connect.</strong> The phone app joins that network and sends flight
+            commands as UDP multicast — connectionless and fast, and tolerant of
+            the occasional dropped packet because control data is transmitted
+            continuously and a lost frame is quickly superseded.
+          </p>
+          <p>
+            The drone carries a camera and an Intel Movidius Myriad&nbsp;2 vision
+            processor for stabilisation, obstacle response, and gesture
+            recognition; video streams back to the connected phone. Two
+            properties matter for what follows: the Tello accepts
+            <strong>multiple clients</strong> on its network, and
+            <strong>every client has the same level of access</strong> as the
+            operator. There is no notion of a privileged controller.
+          </p>
+        </section>
+
+        <section id="method">
+          <h2><span class="n">03</span>Method and setup</h2>
+          <div class="spec">
+            <div><dt>Target</dt><dd>Ryze Tello — open AP, no default password, UDP control channel</dd></div>
+            <div><dt>Attacker</dt><dd>Kali Linux VM on a desktop, with a USB Wi-Fi adapter</dd></div>
+            <div><dt>Tooling</dt><dd>Wi-Fi Pineapple (Recon, PineAP, handshake capture); Hashcat; <code>rockyou.txt</code> wordlist</dd></div>
+            <div><dt>Framework</dt><dd>MITRE ATT&amp;CK, with ATT&amp;CK Navigator for the layer mapping</dd></div>
+          </div>
+          <p>
+            The Wi-Fi Pineapple is used as an accessible front end for standard
+            802.11 attacks — comparable in capability to Aircrack-ng, but with
+            one-click modules for reconnaissance, deauthentication, and handshake
+            capture, plus a documented API for community modules. Preparation is
+            routine: update the Kali VM, install the Pineapple's drivers, and
+            connect through the vendor's helper script to reach its web
+            interface.
+          </p>
+          <p>
+            Scope was limited to the Wi-Fi link between the drone and the
+            connected phone. All work was carried out on the author's own
+            equipment on a private network.
+          </p>
+        </section>
+
+        <section id="attack">
+          <h2><span class="n">04</span>The attack, mapped to ATT&amp;CK</h2>
+          <p>
+            MITRE ATT&amp;CK organises adversary behaviour into <em>tactics</em>
+            (the goals, ordered from reconnaissance through to impact) and
+            <em>techniques</em> (how each goal is achieved). It came out of
+            MITRE's 2013 Fort Meade Experiment, where researchers emulated
+            attacker and defender behaviour to improve post-compromise detection.
+            Mapping an engagement to the matrix turns it into a reusable
+            adversary-emulation scenario; the layer below was built in ATT&amp;CK
+            Navigator.
+          </p>
+
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr><th scope="col">Tactic</th><th scope="col">Technique</th><th scope="col">Against the Tello</th></tr>
+              </thead>
+              <tbody>
+                <tr><td class="tac">Reconnaissance</td><td class="tec">Gather victim network information; active scanning</td><td>Identify the wireless interface, then enumerate the <code>TELLO-xxxx</code> SSID and the drone and phone MAC addresses with the Pineapple recon module</td></tr>
+                <tr><td class="tac">Resource Development</td><td class="tec">Stage capabilities</td><td>Position the attacker phone as a competing client and the Pineapple as a monitor</td></tr>
+                <tr><td class="tac">Initial Access</td><td class="tec">Wireless compromise via deauthentication</td><td>Flood the operator's phone with spoofed deauth frames; it drops off and cannot reconnect</td></tr>
+                <tr><td class="tac">Execution</td><td class="tec">Operator command interface</td><td>The attacker connects to the open AP and issues flight commands from the app</td></tr>
+                <tr><td class="tac">Persistence / Priv-Esc</td><td class="tec">Modify configuration</td><td>Enable WPA2 and reset the SSID and password from the app to lock the original operator out — no privilege boundary to cross, since all clients are equal</td></tr>
+                <tr><td class="tac">Defense Evasion</td><td class="tec">Traffic impersonation</td><td>Control traffic is indistinguishable from a legitimate operator's; nothing is installed on the drone</td></tr>
+                <tr><td class="tac">Credential Access</td><td class="tec">Brute force: password cracking</td><td>Capture the WPA/WPA2 four-way handshake during the deauth; crack it offline with Hashcat and <code>rockyou.txt</code></td></tr>
+                <tr><td class="tac">Discovery</td><td class="tec">System information discovery</td><td>Read and change flight speed, IMU and centre-of-gravity calibration, low-battery behaviour, photo quality, firmware version, and Wi-Fi settings via the app</td></tr>
+                <tr><td class="tac">Lateral Movement</td><td class="tec">—</td><td>Not applicable; the drone is the only target and there is no wider network</td></tr>
+                <tr><td class="tac">Collection</td><td class="tec">Video capture</td><td>The live camera feed is available to the attacker's phone</td></tr>
+                <tr><td class="tac">Command &amp; Control</td><td class="tec">Direct connection</td><td>The attacker's phone connects straight to the drone; no C2 infrastructure needed</td></tr>
+                <tr><td class="tac">Exfiltration</td><td class="tec">Transfer over the control channel</td><td>Photos and video pull to the attacker's device</td></tr>
+                <tr><td class="tac">Impact</td><td class="tec">Denial of service; physical effect</td><td>A power-off command sent mid-flight ends the mission — the drone falls or force-lands</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>Reconnaissance and initial access</h3>
+          <p>
+            The open, passwordless access point is the first finding — it is what
+            makes everything after it possible. With the SSID and the phone's MAC
+            known, the operator's phone is flooded with deauthentication frames
+            spoofed to look as though the phone itself sent them. It drops off the
+            network and cannot re-establish the connection. The drone, now without
+            a client, hovers in place; in poor light it may drift and strike
+            something, and on a hard impact it cuts power and falls. With the
+            operator locked out, the attacker's phone connects and takes the
+            controls.
+          </p>
+
+          <h3>Holding and extending access</h3>
+          <p>
+            From the app, the attacker can rewrite the drone's Wi-Fi
+            configuration: enable WPA2, set a new SSID and password, and lock the
+            original operator out permanently. Because every client is equal,
+            there is nothing to escalate <em>to</em> — being on the network
+            already means full control, including injecting flight and
+            configuration commands through the manufacturer's SDK and redirecting
+            the video stream to the attacker.
+          </p>
+
+          <div class="callout">
+            <span class="k">Impact</span>
+            <p>
+              The exercise stops at a demonstrated power-off in flight. The
+              intent is to establish that the exposure is real and trivial to
+              reach — not to damage equipment. All testing used the author's own
+              drone.
+            </p>
+          </div>
+        </section>
+
+        <section id="crack">
+          <h2><span class="n">05</span>Cracking the Wi-Fi password</h2>
+          <p>
+            If the operator has set a WPA2 password, it can still be recovered
+            offline. The deauthentication in the previous step does double duty:
+            when the phone reconnects, it performs the WPA/WPA2 four-way handshake
+            with the access point, and that handshake alone is enough to test
+            password guesses without ever touching the network again.
+          </p>
+          <p>
+            The Pineapple's recon module can capture handshakes automatically
+            during a scan and export them in Hashcat's <code>22000</code> format.
+            Hashcat then runs a dictionary attack:
+          </p>
+          <pre>hashcat -m 22000 hash.hc22000 rockyou.txt</pre>
+          <p>
+            <code>-m 22000</code> selects the WPA mode; <code>rockyou.txt</code>
+            is the standard leaked-password wordlist. In testing, the network
+            password was recovered. Because the attacker is never connected while
+            guessing, the only real defences are a long, unpredictable passphrase
+            or a move to WPA3-Personal, whose SAE handshake is not vulnerable to
+            this offline dictionary attack.
+          </p>
+        </section>
+
+        <section id="findings">
+          <h2><span class="n">06</span>Findings</h2>
+          <ul class="findings">
+            <li>The Tello ships with an <strong>open access point and no password</strong>. That single default makes every later step possible.</li>
+            <li>A <strong>one-click deauthentication attack</strong> removes the legitimate operator; the drone then hovers, drifts, or crashes.</li>
+            <li>Any WPA2 passphrase the operator sets is <strong>recoverable offline</strong> from a captured handshake unless it is long and random.</li>
+            <li>Every device on the drone's network holds the <strong>same privileges as the operator</strong>, so network access is total control — including SDK-level flight and configuration commands and the video feed.</li>
+            <li>None of this requires skill or custom code: <strong>stock Kali utilities and Pineapple modules</strong> do the work, often from a single command.</li>
+            <li>An attack proven against one Wi-Fi drone <strong>transfers directly</strong> to any other built on the same wireless stack.</li>
+          </ul>
+        </section>
+
+        <section id="recommendations">
+          <h2><span class="n">07</span>Recommendations</h2>
+          <div class="recs">
+            <div class="rec">
+              <h3>For manufacturers</h3>
+              <ul>
+                <li>Ship with WPA2 enabled and a unique, printed, per-device password — never an open AP.</li>
+                <li>Support 802.11w (protected management frames) to blunt deauthentication attacks.</li>
+                <li>Move to WPA3-Personal (SAE) to eliminate offline handshake cracking.</li>
+                <li>Separate operator privileges from ordinary network clients.</li>
+              </ul>
+            </div>
+            <div class="rec">
+              <h3>For operators</h3>
+              <ul>
+                <li>Set a long, random passphrase before the first flight.</li>
+                <li>Assume anyone within Wi-Fi range can see the drone and attempt to disrupt it.</li>
+                <li>Keep firmware current; prefer models that document their security posture.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section id="conclusion">
+          <h2><span class="n">08</span>Conclusion</h2>
+          <p>
+            A buyer should be able to assume a retail drone is reasonably secure.
+            For the Wi-Fi class, this study finds the opposite: the attack surface
+            is almost entirely 802.11, the vulnerabilities are old and well
+            documented, and an attack proven against one device carries over to
+            the next. Small drones cannot carry the defences of military systems —
+            but an open access point and a weak default password are choices, not
+            constraints. Privacy and security have to be designed in from the
+            start, not bolted on after the incident reports.
+          </p>
+        </section>
+
+        <div class="article__foot">
+          <div class="ethics">
+            <strong>Authorisation and intent.</strong> All testing was carried
+            out on the author's own drone and equipment, on a private network,
+            for research and education. No third-party systems or aircraft were
+            involved. The techniques are standard 802.11 attacks documented in
+            the public literature; they are presented here to argue for better
+            defaults — not as an operational guide. Do not use them against
+            equipment or networks you do not own.
+          </div>
+          <p>
+            Adapted and edited from a 2023 research paper by Oreoluwa Fagbamiye,
+            <em>&ldquo;Drone Hacking: Hijacking a Wi-Fi-Based Drone Applying the
+            MITRE ATT&amp;CK Framework.&rdquo;</em>
+          </p>
+          <p>
+            Code and full reference list:
+            <a href="https://github.com/ocfagb/wifi-drone-hijacking-mitre-attack">github.com/ocfagb/wifi-drone-hijacking-mitre-attack</a>
+            · Licensed CC BY 4.0.
+          </p>
+        </div>
+      </article>
+    </main>
+
+    <footer class="footer">
+      <div class="container footer__inner">
+        <span>© <span id="year"></span> Oreoluwa Fagbamiye</span>
+        <span>Atlanta, GA · Built with HTML, CSS &amp; JavaScript — hosted on GitHub Pages</span>
+      </div>
+    </footer>
+
+    <script src="../script.js"></script>
+  </body>
+</html>
