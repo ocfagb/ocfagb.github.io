@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Automating a Job Search — Oreoluwa Fagbamiye</title>
+    <meta
+      name="description"
+      content="Building an end-to-end job-search pipeline: scraping, a resume-matching heuristic, a stateful dashboard built on live app capabilities, and prompt engineering for outreach emails that actually get read."
+    />
+    <meta name="author" content="Oreoluwa Fagbamiye" />
+    <meta property="og:title" content="Automating a Job Search: From Scraping to Outreach" />
+    <meta property="og:description" content="Scraping, resume-matching, a stateful dashboard, and iterating on outreach-email prompts through a real feedback loop." />
+    <meta property="og:type" content="article" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../styles.css" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2322d3ee' stroke-width='2'%3E%3Cpath d='M12 2l8 4v6c0 5-3.4 8-8 10-4.6-2-8-5-8-10V6l8-4z'/%3E%3Cpath d='M9 12l2 2 4-4'/%3E%3C/svg%3E"
+    />
+
+    <style>
+      .article { max-width: 760px; margin-inline: auto; padding-block: clamp(var(--space-10), 6vw, var(--space-20)); }
+      .article__eyebrow { font-family: var(--font-display); font-size: var(--text-xs); letter-spacing: 0.14em; text-transform: uppercase; color: var(--color-primary); }
+      .article h1 { font-family: var(--font-display); font-weight: 700; font-size: var(--text-xl); line-height: 1.15; letter-spacing: -0.01em; margin: var(--space-4) 0 var(--space-4); text-wrap: balance; }
+      .article__deck { font-size: var(--text-lg); color: var(--color-text-muted); line-height: 1.5; margin-bottom: var(--space-5); text-wrap: pretty; }
+      .article__meta { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-4); font-size: var(--text-sm); color: var(--color-text-muted); font-family: var(--font-display); }
+      .article__meta strong { color: var(--color-text); font-weight: 500; }
+      .article__chips { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-5); }
+      .article section { margin-top: var(--space-12); }
+      .article h2 { font-family: var(--font-display); font-weight: 700; font-size: var(--text-lg); letter-spacing: -0.01em; margin-bottom: var(--space-4); display: flex; gap: var(--space-3); align-items: baseline; }
+      .article h2 .n { color: var(--color-primary); font-size: var(--text-sm); flex: none; }
+      .article h3 { font-size: var(--text-base); font-weight: 600; margin: var(--space-6) 0 var(--space-2); }
+      .article p { margin-bottom: var(--space-4); line-height: 1.7; }
+      .article a { color: var(--color-primary); text-underline-offset: 3px; }
+      .article strong { color: var(--color-text); font-weight: 600; }
+      .article em { color: var(--color-text); }
+      .abstract { background: var(--color-surface); border: 1px solid var(--color-border); border-left: 3px solid var(--color-primary); border-radius: var(--radius-md); padding: var(--space-5) var(--space-6); margin-top: var(--space-8); }
+      .abstract .k { font-family: var(--font-display); font-size: var(--text-xs); letter-spacing: 0.14em; text-transform: uppercase; color: var(--color-text-faint); margin-bottom: var(--space-3); }
+      .abstract p { margin: 0; }
+      .toc { margin-top: var(--space-6); padding-top: var(--space-5); border-top: 1px solid var(--color-divider); }
+      .toc ol { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: var(--space-2) var(--space-6); counter-reset: t; }
+      .toc li { counter-increment: t; }
+      .toc a { color: var(--color-text-muted); text-decoration: none; font-size: var(--text-sm); display: block; padding: var(--space-1) 0; }
+      .toc a::before { content: counter(t, decimal-leading-zero) "  "; font-family: var(--font-display); color: var(--color-text-faint); font-size: var(--text-xs); }
+      .toc a:hover { color: var(--color-primary); }
+      .spec { border: 1px solid var(--color-border); border-radius: var(--radius-md); overflow: hidden; margin: var(--space-5) 0; }
+      .spec div { display: grid; grid-template-columns: minmax(6rem, 8rem) 1fr; gap: var(--space-4); padding: var(--space-3) var(--space-5); font-size: var(--text-sm); }
+      .spec div + div { border-top: 1px solid var(--color-divider); }
+      .spec dt { font-family: var(--font-display); font-size: var(--text-xs); letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-text-faint); }
+      .spec dd { margin: 0; }
+      .article pre { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-4) var(--space-5); overflow-x: auto; font-family: var(--font-display); font-size: var(--text-sm); margin: var(--space-4) 0; color: var(--color-text); white-space: pre-wrap; }
+      .article :not(pre) > code { font-family: var(--font-display); font-size: 0.9em; background: var(--color-surface-offset); border: 1px solid var(--color-divider); border-radius: var(--radius-sm); padding: 0.05em 0.35em; }
+      .findings { list-style: none; margin: var(--space-5) 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-4); }
+      .findings li { position: relative; padding-left: var(--space-6); line-height: 1.6; }
+      .findings li::before { content: ""; position: absolute; left: 0; top: 0.55em; width: 0.5rem; height: 0.5rem; background: var(--color-primary); transform: rotate(45deg); }
+      .recs { display: grid; gap: var(--space-5); margin: var(--space-5) 0; }
+      @media (min-width: 680px) { .recs { grid-template-columns: 1fr 1fr; } }
+      .rec { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-5); }
+      .rec h3 { margin: 0 0 var(--space-3); }
+      .rec ul { margin: 0; padding-left: var(--space-5); display: flex; flex-direction: column; gap: var(--space-2); }
+      .rec li { font-size: var(--text-sm); line-height: 1.5; }
+      .rec li::marker { color: var(--color-primary); }
+      .callout { background: var(--color-warning-highlight); border: 1px solid color-mix(in oklab, var(--color-warning) 40%, transparent); border-radius: var(--radius-md); padding: var(--space-4) var(--space-5); margin: var(--space-6) 0; font-size: var(--text-sm); }
+      .callout .k { font-family: var(--font-display); font-size: var(--text-xs); letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-warning); display: block; margin-bottom: var(--space-2); }
+      .callout p { margin: 0; }
+      .article__foot { margin-top: var(--space-16); padding-top: var(--space-6); border-top: 1px solid var(--color-divider); font-size: var(--text-sm); color: var(--color-text-muted); line-height: 1.6; }
+      .article__foot .ethics { background: var(--color-surface-2); border: 1px solid var(--color-divider); border-radius: var(--radius-md); padding: var(--space-4) var(--space-5); margin-bottom: var(--space-5); }
+      .article__foot .ethics strong { color: var(--color-text); }
+      .back-link { display: inline-flex; align-items: center; gap: var(--space-2); font-family: var(--font-display); font-size: var(--text-sm); color: var(--color-text-muted); text-decoration: none; margin-bottom: var(--space-6); }
+      .back-link:hover { color: var(--color-primary); }
+    </style>
+  </head>
+  <body>
+    <header class="header">
+      <div class="container header__inner">
+        <a href="../index.html#top" class="logo" aria-label="Oreoluwa Fagbamiye — home">
+          <svg class="logo__mark" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M12 2l8 4v6c0 5-3.4 8-8 10-4.6-2-8-5-8-10V6l8-4z" />
+            <path d="M9 12l2 2 4-4" />
+          </svg>
+          <span>ore.fagbamiye<span style="color: var(--color-text-faint)">.sec</span></span>
+        </a>
+        <nav class="nav" aria-label="Primary">
+          <a href="../index.html#experience">Experience</a>
+          <a href="../index.html#skills">Skills</a>
+          <a href="../index.html#projects">Projects</a>
+          <a href="../index.html#contact">Contact</a>
+        </nav>
+        <div class="header__actions">
+          <button class="theme-toggle" data-theme-toggle aria-label="Switch to light mode">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <circle cx="12" cy="12" r="5" />
+              <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="container">
+      <article class="article">
+        <a href="../index.html#projects" class="back-link">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7" /></svg>
+          All projects
+        </a>
+
+        <p class="article__eyebrow">Automation · AI engineering</p>
+        <h1>Automating a job search: from scraping to outreach</h1>
+        <p class="article__deck">
+          A job search is a data pipeline wearing a trench coat: scrape
+          postings, score them against a resume, track state so nothing
+          repeats, and draft outreach that's actually worth reading. This is
+          what I built, what didn't work the first three times, and what
+          changed once the feedback loop included a skeptical reader.
+        </p>
+        <div class="article__meta">
+          <span>By <strong>Oreoluwa Fagbamiye</strong></span>
+          <span>Personal project 2026</span>
+          <span>~10 min read</span>
+        </div>
+        <div class="article__chips">
+          <span class="tag">Apify actors</span>
+          <span class="tag">Claude Artifacts</span>
+          <span class="tag">MCP connectors</span>
+          <span class="tag">Prompt engineering</span>
+          <span class="tag">Cloud scheduling</span>
+          <span class="tag">Python</span>
+        </div>
+
+        <div class="abstract">
+          <p class="k">Abstract</p>
+          <p>
+            This project scrapes job postings from two boards through Apify
+            actors, scores each one against a resume using a keyword-coverage
+            heuristic tuned to filter out seniority and off-topic noise, and
+            tracks every posting's status in a dashboard that is a real
+            stateful app rather than a static report: it reads and writes a
+            shared database, calls a user's own Gmail and Calendar accounts
+            directly through OAuth-scoped connectors, and drafts personalized
+            outreach on demand. The interesting engineering problem turned
+            out not to be the scraping. It was getting a language model to
+            write a cold email that a specific, skeptical human would
+            actually respond to, which took several complete rewrites of the
+            prompt and, eventually, a second model call whose only job is to
+            read the first draft and argue with it.
+          </p>
+        </div>
+
+        <nav class="toc" aria-label="Contents">
+          <ol>
+            <li><a href="#problem">The actual problem</a></li>
+            <li><a href="#architecture">Architecture</a></li>
+            <li><a href="#scoring">Scoring fit without an LLM call per posting</a></li>
+            <li><a href="#dashboard">A dashboard that is an app, not a report</a></li>
+            <li><a href="#emails">Prompting for emails that get replies</a></li>
+            <li><a href="#loop">Closing the loop without overreaching</a></li>
+            <li><a href="#unattended">Running unattended</a></li>
+            <li><a href="#lessons">Lessons</a></li>
+          </ol>
+        </nav>
+
+        <section id="problem">
+          <h2><span class="n">01</span>The actual problem</h2>
+          <p>
+            Job searching at any real volume is a tracking problem before it
+            is a writing problem. Postings repeat across boards, application
+            statuses live in your head or nowhere, and the parts that
+            actually take judgment (does this posting fit, and what should I
+            say to this specific hiring team) are exactly the parts that get
+            skipped when you are doing everything by hand at 11pm. The goal
+            was to automate the mechanical parts completely and keep a human
+            decision point in front of anything that leaves the system, while
+            still letting the writing be genuinely tailored rather than a
+            mail-merge.
+          </p>
+        </section>
+
+        <section id="architecture">
+          <h2><span class="n">02</span>Architecture</h2>
+          <div class="spec">
+            <div><dt>Scraping</dt><dd>Apify actors for two job boards, run against a fixed list of target titles, deduplicated by URL into a persistent tracker</dd></div>
+            <div><dt>Scoring</dt><dd>Python heuristic: keyword-coverage against the resume, plus seniority and off-topic title filters, plus a location/remote filter</dd></div>
+            <div><dt>Dashboard</dt><dd>A published app (not a static page) with a shared database, connector calls to Gmail/Calendar, and on-demand AI drafting</dd></div>
+            <div><dt>Scheduling</dt><dd>A cron-triggered cloud agent re-runs the scrape/score/publish cycle on an interval and commits state back to a repo</dd></div>
+          </div>
+          <p>
+            Each stage writes to a small set of JSON files that the next
+            stage reads, which sounds almost too simple to mention, except
+            that it is the reason the whole thing can be re-run safely. The
+            tracker is keyed by posting URL, so a re-scrape only ever adds
+            what is new; nothing gets re-processed, re-scored, or re-surfaced
+            once it has a real status attached to it.
+          </p>
+        </section>
+
+        <section id="scoring">
+          <h2><span class="n">03</span>Scoring fit without an LLM call per posting</h2>
+          <p>
+            Running every scraped posting through a language model to judge
+            fit would work, but it is slow and expensive at volume, and it is
+            genuinely unnecessary for triage. Instead, fit is a keyword-
+            coverage score: a shared taxonomy of terms (tools, certifications,
+            methodologies) is matched against both the resume and each
+            posting's description, and the score is the fraction of the
+            posting's matched terms that the resume also covers.
+          </p>
+          <p>
+            The first version of this was too generous. A posting that
+            happened to mention four or five common terms could hit 100% on
+            a handful of matches, which meant senior and completely
+            unrelated roles were scoring as strong fits purely because the
+            denominator was small. The fix was raising the minimum number of
+            matched terms required before a score is trusted at all, and
+            adding a separate title-based filter for seniority language and
+            off-topic roles before scoring even runs. A heuristic like this
+            is a triage tool, not a verdict, and it is worth being honest
+            about that in the UI rather than presenting a percentage as more
+            certain than it is.
+          </p>
+        </section>
+
+        <section id="dashboard">
+          <h2><span class="n">04</span>A dashboard that is an app, not a report</h2>
+          <p>
+            The interesting decision here was refusing to let the dashboard
+            be a static rendering of the tracker data. It is a published app
+            with its own small database, and it declares three runtime
+            capabilities: shared state that persists across sessions and
+            devices, connector access that lets the page call a signed-in
+            user's own Gmail and Calendar accounts directly (the app never
+            sees the credentials, only the result), and on-demand model
+            calls for drafting.
+          </p>
+          <p>
+            That combination means a selection made in the dashboard, a
+            recruiter contact typed into a field, or an application marked
+            complete is durable and visible from any device without a
+            separate backend to run or pay for. Marking something as applied
+            triggers a real calendar event on the user's own calendar, using
+            their own OAuth grant, initiated by their own explicit click. No
+            action fires automatically from a background process; every
+            connector call traces back to a user gesture.
+          </p>
+        </section>
+
+        <section id="emails">
+          <h2><span class="n">05</span>Prompting for emails that get replies</h2>
+          <p>
+            This is where most of the actual iteration happened, and it is
+            worth walking through because the failure modes were not subtle
+            once I could name them.
+          </p>
+          <h3>First pass: generic</h3>
+          <p>
+            The first prompt asked for a short, personalized email using a
+            handful of resume highlights. What came back was competent and
+            interchangeable, the kind of email that could have been sent to
+            five different companies without anyone noticing. It named
+            general skill categories instead of the specific tools a posting
+            actually listed, and it closed with a passive line like
+            <em>"I'd welcome the chance to discuss further,"</em> which asks
+            for nothing and is trivially easy to ignore.
+          </p>
+          <h3>Second pass: evidence, not adjectives</h3>
+          <p>
+            The fix was forcing every claim to trace to a specific, sourced
+            fact, expressed in the posting's own vocabulary rather than a
+            paraphrase, plus an explicit list of things the candidate
+            genuinely does not have experience with that the model is told
+            never to claim and never to apologize for. Silence on a real gap
+            reads as confident; a vague dodge reads as evasive. The closing
+            line changed from a passive wish to a specific, time-bound ask,
+            because a recruiter can say yes or no to "could we do a
+            fifteen-minute call this week," and cannot easily act on
+            "I look forward to hearing from you."
+          </p>
+          <h3>Third pass: coverage versus brevity, on purpose</h3>
+          <p>
+            A conventional cold-email rule is to keep it under 150 words and
+            pick two or three highlights. That is correct advice for a
+            generic recruiter skim, and it is the wrong shape for a posting
+            whose requirements list is long, specific, and clearly written by
+            the person who will actually read the response, not a
+            keyword filter. For that kind of posting, comprehensive,
+            explicit coverage of every listed requirement, including an
+            honest admission where something is genuinely missing, reads as
+            attentive rather than long. The right length depends on who is
+            reading, which is not something a fixed word-count rule can know
+            on its own.
+          </p>
+          <h3>Fourth pass: a second model call that argues with the first</h3>
+          <p>
+            The single biggest quality jump came from splitting generation
+            into two separate calls instead of one. The first call drafts.
+            The second call is handed only the draft and the original
+            posting, and is told to read it as a specific, skeptical
+            recipient deciding whether to reply, then revise anything that
+            fails that read. A model critiquing text it did not just write
+            catches problems it reliably misses while still composing,
+            in the same way a second pass of your own writing the next
+            morning catches things the first pass could not see.
+          </p>
+          <pre>draft = generate(posting, resume_facts)
+final = critique_and_revise(draft, posting)  # separate call, adversarial framing</pre>
+        </section>
+
+        <section id="loop">
+          <h2><span class="n">06</span>Closing the loop without overreaching</h2>
+          <p>
+            An early version of the scheduled routine also scanned the
+            user's inbox for application-confirmation emails and used them
+            to automatically mark postings as applied. It worked, technically,
+            but it moved a decision that belongs to the user into a
+            background process making judgment calls about what an email
+            "counts" as, with no review step. The better design keeps status
+            changes as an explicit, user-driven action inside the dashboard,
+            and treats an automated inbox scan as a feature to reach for
+            deliberately rather than a default running silently underneath
+            everything else. Automating the mechanical parts is the goal;
+            automating the decisions is a different, much riskier thing, and
+            the two are easy to blur together if you are not paying
+            attention.
+          </p>
+        </section>
+
+        <section id="unattended">
+          <h2><span class="n">07</span>Running unattended</h2>
+          <p>
+            The scrape-score-publish cycle runs on a schedule as a cloud
+            agent with its own isolated checkout of the project repository,
+            rather than depending on a machine staying on. State (which
+            postings have been seen, how they scored) is committed back to
+            the repository after each run, which is what makes the
+            scheduled runs actually additive instead of starting from zero
+            every time. The resume itself never travels with the code: a
+            separate local-only step extracts just the skill keywords the
+            scoring step needs into a small file with no personal
+            information in it, and that is the only resume-derived artifact
+            that is version-controlled or reachable by the scheduled job.
+          </p>
+        </section>
+
+        <section id="lessons">
+          <h2><span class="n">08</span>Lessons</h2>
+          <ul class="findings">
+            <li><strong>A heuristic score is a triage tool, not a verdict</strong>, and the UI should say so plainly rather than presenting a percentage with false precision.</li>
+            <li><strong>Specificity beats highlight-reeling.</strong> Naming the exact term a posting used consistently reads as more credible than a paraphrased, safer-sounding category.</li>
+            <li><strong>An admitted gap is more persuasive than an evasive one.</strong> Silence around something a careful reader would notice reads as hiding it; saying it directly reads as confidence.</li>
+            <li><strong>A second, adversarially framed model call is worth the extra latency.</strong> Self-critique in a single pass is weaker than a genuinely separate read of already-written text.</li>
+            <li><strong>Automate the mechanical steps; keep a person on every decision that leaves the system</strong> or changes what a human believes happened. It is tempting to automate both, and only one of them is actually a good idea.</li>
+            <li><strong>Keep personal data out of anything that has to be portable.</strong> Extracting facts instead of committing source documents made the pipeline safely runnable in a separate cloud environment.</li>
+          </ul>
+        </section>
+
+        <div class="article__foot">
+          <div class="ethics">
+            <strong>What's not shown here.</strong> This write-up describes
+            the engineering only. The actual pipeline, tracker data, scraped
+            postings, and any contact information it has found are kept in a
+            private repository, since they reflect a live, personal job
+            search rather than something meant to be public.
+          </div>
+          <p>Built with Python, Apify, and Claude Code / Claude Artifacts.</p>
+        </div>
+      </article>
+    </main>
+
+    <footer class="footer">
+      <div class="container footer__inner">
+        <span>© <span id="year"></span> Oreoluwa Fagbamiye</span>
+        <span>Atlanta, GA · Built with HTML, CSS &amp; JavaScript — hosted on GitHub Pages</span>
+      </div>
+    </footer>
+
+    <script src="../script.js"></script>
+  </body>
+</html>
